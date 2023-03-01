@@ -1,0 +1,257 @@
+Blockchain Overview
+notes taken from alchemy university Solidity Fundamentals Course
+
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+*******************************************
+WEEK ONE:
+*******************************************
+two important primitives
+  cryptographic hashes
+  public key cryptography
+
+blockchain's purpose:
+  to implement a network of computers that agree upon a common state of data, via concensus
+    concensus:
+      how a network comes to agreement on the state of the data
+  any person or organization should be able to participate in the process, not control process
+
+smart contract blockchains:
+  allow developers to decentralize where the code runs
+  allows no direct ownership, making it censorship resistant and transparently verifiable
+
+decentralization:
+  main focus is on how the code is executed, not the code itself
+  code becomes publicly available on blockchain and nodes in the network will enforce the logic of the code through financial incentives of blockchain protocol
+
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+*******************************************
+Blockchain cryptography basics:
+*******************************************
+
+SHA256:
+  properties:
+    cryptographic hash function that provides 256 bit output, (2^256 combinations)
+    deterministic:
+      One specific input always maps to the same specific output
+    pseudorandom:
+      It is not possible to guess the output based on the output of similar inputs
+    one-way:
+      If someone gives you a new output, you could not determine an input without guessing
+    fast to compute:
+      It must be a quick calculation for a computer
+    collision-resistant:
+      The chance of a collision should be infinitesimally small
+  use cases:
+    commitments (protocol and smart contract)
+    proof of work
+
+-----------------------------------------------------------------------------------------------:
+cryptographic hashes:
+  hashing: 
+    process where algorithm is used to turn any kind of data into a fixed length representation of that data
+  hash function: 
+    input is data and output is fixed length representation
+
+-----------------------------------------------------------------------------------------------:
+rainbow table:
+  a table which maps common inputs to their hash output
+  used by hackers to compare common password hashes to hashes in a database, if any match then hackers now know the input
+  salts, random values added to an input before hashed, are used to protect passwords in this scenario  
+
+-----------------------------------------------------------------------------------------------:
+public key cryptography:
+  provides authentication by signing messages:
+    common process involves signing a hashed message, blockchain recovers the public key from signature, and then verifies signature which is the user's address 
+  encryption:
+    data is encrypted with a user's public key, only that user can decrypt data with their private key
+  
+  two popular used algorithms for public key cryptography:
+    RSA:
+    ECDSA:
+      popular because it can provide same level of security as other algorithms but smaller key size
+      used by Bitcoin and Ethereum, specifically the secp256k1 curve
+      returns signature along with a recovery bit, which allows us to recover a public key from the signature, this reduces data storage
+      address of sender is different from public key, but you can always derive the address if you have the public key
+
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+*******************************************
+MINING, AND PROOF OF WORK:
+*******************************************
+main concensus rules for proof of work:
+  you cannot double spend
+  Nakomoto Concensus:
+    the longest chain will be one the rest of the nodes accept as the one true chain, determined by a chain's cumulative work
+  
+mining: 
+  process of creating a block of transactions to be added to a blockchain
+miners:
+  nodes, or computers, that contain mining software
+
+Process:
+  Miners are in charge of extending a blockchain by adding blocks that contain "valid" transactions. In order to add a block, the network will ask miners for their 'proof-of-work'.
+  the automated mining software has one job... take a piece of data (ie. the prev block header + new transactions to add to a chain) and hash it. If the hash output is below a target difficulty, then the miner has found the answer to the puzzle... a valid proof of work
+  difficulty:
+    determined by number of leading zeroes, since the hash is in hexadecimal format, the average number of attempts to find hash can be denoted by 16^difficulty
+    adjusted every 2016 blocks to keep mining intervals around 10 minutes per block, which is about every two weeks with blocks being mined on average every 10 minutes, 
+    The difficulty is adjusted so that, as more machines enter the network and the hash power increases, the difficulty of finding a new block increases (and vice-versa). This allows bitcoin to scale to its network size.
+  algorithm:
+    Take current block’s block header, add mempool transactions
+    Append a nonce, starting at nonce = 0
+    Hash data from #1 and #2
+    Check hash versus target difficulty (provided by protocol)
+    If hash < target, puzzle is solved! Get rewarded.
+    Else, restart process from step #2, but increment nonce
+  principals:
+    In exchange for the large amounts of energy and hardware upkeep required to run mining software, miners receive currency as a reward.
+    In proof-of-work, miners must present a proof (in the form of a hash output on valid input data) that they expended energy in order to successfully "mine" a block and have it extend a blockchain.
+
+  adding valid transactions:
+    users who want to make transactions will broadcast their transactions to the blockchain network
+    mempool:
+      place for miners to keep those transactions before adding them to a block
+    block headers:
+      contain software version, timestamp, merkle root of transactions, previous block hash, and difficulty
+      all the information in the header of the block is hashed together to create a unique hash based on those properties.
+      If anything changes in the header, it will affect the hash. Since each block also contains the hash of the block before it, it will affect every future block as well.
+  
+  block size:
+    there is a specific block size limit that cannot be exceeded
+    the number of transactions that will fit inside of a block varies due to transactions being of all different sizes
+
+security in POW system:
+  You can think of Proof of Work as the security of the Bitcoin system. Thousands of nodes are working to find hashes of data in the Bitcoin network at any given time. These machines are financially incentivized through rewards when they find the hash. This process is known as mining. 
+
+  In order to overpower this network and force your own version of the truth, you would need to come up with more computing power than all the nodes in the entire system. This is referred to as a 51% attack because you need to have 51% of the total hashing power in the network. Even accomplishing this you are extremely limited in what you can actually accomplish.
+
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+*******************************************
+Blockchain structure:
+*******************************************
+  distributed ledger:
+    distributed (p2p) database of a list of validated blocks
+    each block is tied to each other because its hash is in part based on previous block's hash
+  genesis block:
+    the first block in a blockchain.
+    index 0
+  confirmations:
+    number of blocks since the genesis block
+  
+  each block contains:
+    index
+    timestamp
+    hash:
+      entire block's data is used as input for hash
+    prev hash
+    data
+    nonce
+  
+  requirements for adding a new block:
+    Block index is one greater than latest block index.
+    Block previous hash equal to latest block hash.
+    Block hash meets difficulty requirement.
+    Block hash is correctly calculated (all fields are correct).
+
+  consensus when there are multiple versions of the blockchain at any given time:
+    when a miner finds a new block, it broadcasts its new version of blockchain to all peers
+    longest valid blockchain wins
+    idea is node with the most computational resources behind it is the current version of the truth.
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+*******************************************
+Digital wallet Project:
+*******************************************
+  recommends 'ethereum-cryptography' library to implement public key cryptography
+  https://github.com/ethereum/js-ethereum-cryptography
+  https://www.npmjs.com/package/ethereum-cryptography#secp256k1-curve
+  https://github.com/paulmillr/noble-secp256k1
+  summary:
+    private key is held offline/seperately from client in wallet
+    client sends transaction to wallet, wallet signs transaction, sends msgHash and signature
+    client sends signature and msgHash to server
+    server verifies signature and msgHash with public key
+
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+*******************************************
+*******************************************
+WEEK TWO:
+*******************************************
+*******************************************
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+*******************************************
+UTXO AND ACCOUNT MODELS:
+*******************************************
+Nodes in a blockchain peer-to-peer network, like Bitcoin, can leave and re-enter the network at will. Bitcoin has nodes including full nodes and light nodes.
+  full node: 
+    contains entire blockchain file.
+  light node: 
+    does not require full blockchain file download, communicates with a full node to allow for lightweight clients to work (ie. wallets)
+
+Bitcoin and Ethereum use two different models to keep track of user state, or balances.
+UTXO Model:
+  bitcoin model
+  "unspent transaction output"
+  outputs from state changing transactions that credit users with a certain amount of BTC
+  user balances are kept with specific utxos, (ie Dominick has 29 UTXOS that amount to 2.65 BTC)
+  all utxos are non fungible,  and a user's UTXOs are scattered across blocks
+  i like to them of them as pointers to unspent coins
+  once a utxo is consumed it is marked as "spent", new utxos are created representing the change amounts and are marked as "unspent"
+  each utxo has a script associated with it that allows unlock of coin with private key
+  each transaction can have many inputs and many outputs, only rule is that total value of inputs must be greater than total value of outputs
+  pros:
+    very good privacy if user uses a new address per tx
+  cons:
+    utos are stateless, which complicates state heavy designs
+  transaction fees:
+    when totalOfInputs is greater than totalOfOutputs, the difference is amount for a new utxo that is collected by miner for transaction fee
+
+Account Model: 
+  ethereum model
+  keep track of overall state, or balance (ie has 4.2 ETH)
+  pros:
+    easier to quickly understand
+  cons:
+    replay attack issue 
+    this issue can be resolved with a nonce per tx
+
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+-----------------------------------------------------------------------------------------------:
+*******************************************
+TREE DATA STRUCTURES:
+*******************************************
+tree:
+  data structure that implements efficient searching and sorting of data
+  implements recursive algorithms
+  adding a whole new layer of elements results in only 1 more search attempt at worst
+
+terminology:
+  root node:
+    top, beginning node
+  key:
+    data stored in node
+  leaf nodes:
+    nodes who do not have children
+  parent and children nodes:
+    parent nodes contain link, or edge, to children nodes that are below them in tree
+  siblings:
+    nodes that are at the same level of tree
+  height:
+    number of levels of nodes between the bottommost leaf node and root node
+  subtree:
+    partitions of tree
+  
+binary tree:
+  when each node has at most two children
